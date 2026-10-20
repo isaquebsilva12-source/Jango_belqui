@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="text-base">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal EJA - Educação de Jovens e Adultos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        ejaGreen: {
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom High Contrast Rules */
+        .high-contrast {
+            background-color: #000000 !important;
+            color: #ffff00 !important;
+        }
+        .high-contrast * {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border-color: #ffff00 !important;
+        }
+        .high-contrast a, .high-contrast button {
+            color: #ffff00 !important;
+            text-decoration: underline !important;
+        }
+        .high-contrast .accent-hc {
+            color: #00ffff !important;
+        }
+        /* Smooth Font Scaling */
+        html {
+            transition: font-size 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white" id="app-body">
+
+    <!-- BARRA DE ACESSIBILIDADE FIXA -->
+    <section class="bg-slate-900 text-white py-2 px-4 text-xs md:text-sm border-b border-slate-700" aria-label="Acessibilidade">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-universal-access text-brand-500 text-base" aria-hidden="true"></i>
+                <span class="font-medium">Acessibilidade:</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <!-- Controle de Fonte -->
+                <div class="flex items-center space-x-1 bg-slate-800 rounded-md p-1">
+                    <span class="sr-only">Tamanho da fonte</span>
+                    <button onclick="changeFontSize(-1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold transition" title="Diminuir Fonte (A-)">A-</button>
+                    <button onclick="resetFontSize()" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold transition" title="Restaurar Fonte">A</button>
+                    <button onclick="changeFontSize(1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold transition" title="Aumentar Fonte (A+)">A+</button>
+                </div>
+                <!-- Alto Contraste -->
+                <button onclick="toggleHighContrast()" class="flex items-center space-x-1 px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded font-bold text-xs transition" title="Alternar Alto Contraste">
+                    <i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>
+                    <span>Alto Contraste</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CABEÇALHO & NAVEGAÇÃO -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-brand-600 text-white p-3 rounded-xl shadow-lg flex items-center justify-center">
+                        <i class="fa-solid fa-book-open-reader text-2xl" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <a href="#" class="text-xl sm:text-2xl font-extrabold text-brand-900 tracking-tight block">Portal EJA</a>
+                        <span class="text-xs text-slate-500 font-medium block">Educação de Jovens e Adultos</span>
+                    </div>
+                </div>
+
+                <!-- Menu Desktop -->
+                <nav class="hidden md:flex space-x-6 font-semibold text-slate-700">
+                    <a href="#inicio" class="hover:text-brand-600 transition py-2 border-b-2 border-transparent hover:border-brand-600">Início</a>
+                    <a href="#materias" class="hover:text-brand-600 transition py-2 border-b-2 border-transparent hover:border-brand-600">Matérias & Módulos</a>
+                    <a href="#recursos" class="hover:text-brand-600 transition py-2 border-b-2 border-transparent hover:border-brand-600">Recursos & Quiz</a>
+                    <a href="#trabalhador" class="hover:text-brand-600 transition py-2 border-b-2 border-transparent hover:border-brand-600">Espaço Trabalhador</a>
+                </nav>
+
+                <!-- Botão Menu Mobile -->
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none" aria-label="Abrir Menu">
+                    <i class="fa-solid fa-bars text-2xl" id="menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-2">
+            <a href="#inicio" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Início</a>
+            <a href="#materias" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Matérias & Módulos</a>
+            <a href="#recursos" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Recursos & Quiz</a>
+            <a href="#trabalhador" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Espaço Trabalhador</a>
+        </div>
+    </header>
+
+    <main class="flex-grow" id="inicio">
+
+        <!-- BANNER PRINCIPAL (HERO SECTION) -->
+        <section class="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white py-12 md:py-20 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid md:grid-cols-12 gap-8 items-center">
+                    <div class="md:col-span-7 space-y-6 text-center md:text-left">
+                        <span class="inline-block bg-amber-400 text-slate-900 font-extrabold text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
+                            <i class="fa-solid fa-star mr-1"></i> Seus sonhos não têm prazo de validade
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">
+                            Nunca é tarde para <span class="text-amber-300 underline decoration-amber-400 decoration-4">aprender</span>, transformar e realizar.
+                        </h1>
+                        <p class="text-base sm:text-lg text-brand-100 max-w-2xl leading-relaxed">
+                            Bem-vindo ao seu portal de estudos! Conteúdos práticos, objetivos e pensados para a sua rotina de trabalho e família. Estude no seu ritmo.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
+                            <a href="#recursos" class="bg-ejaGreen-500 hover:bg-ejaGreen-600 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-base">
+                                <i class="fa-solid fa-circle-play"></i>
+                                <span>Ver Atividades da Semana</span>
+                            </a>
+                            <a href="#materias" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3.5 rounded-xl border border-white/30 backdrop-blur-sm transition flex items-center justify-center space-x-2 text-base">
+                                <i class="fa-solid fa-layer-group"></i>
+                                <span>Explorar Módulos</span>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Card Acolhedor Lateral -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="bg-white text-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl border-4 border-amber-300 max-w-md w-full">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="bg-brand-100 text-brand-700 p-3 rounded-full">
+                                    <i class="fa-solid fa-quote-left text-xl"></i>
+                                </div>
+                                <h2 class="font-bold text-lg text-brand-900">Aviso do Professor</h2>
+                            </div>
+                            <p class="text-slate-600 text-sm sm:text-base leading-relaxed italic mb-4">
+                                "A educação é o primeiro passo para conquistar novos direitos e horizontes. Conte conosco em cada etapa da sua caminhada!"
+                            </p>
+                            <div class="border-t border-slate-200 pt-3 flex justify-between items-center text-xs text-slate-500 font-semibold">
+                                <span><i class="fa-regular fa-calendar-check mr-1 text-brand-600"></i> Atualizado esta semana</span>
+                                <span class="text-ejaGreen-700 bg-ejaGreen-50 px-2 py-1 rounded">EJA Fundamental & Médio</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO MÓDULOS / MATÉRIAS -->
+        <section id="materias" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">
+                        Módulos de Aprendizagem Prática
+                    </h2>
+                    <p class="text-slate-600 text-base">
+                        Selecione a área do conhecimento para acessar materiais explicativos com foco nas necessidades do seu dia a dia.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                    <!-- Módulo 1: Português -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center text-2xl font-bold mb-4">
+                                <i class="fa-solid fa-pen-nib"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Língua Portuguesa & Comunicação</h3>
+                            <p class="text-slate-600 text-sm mb-4">
+                                Leitura e interpretação de avisos, formulários, redação de bilhetes, documentos do cotidiano e expressão verbal.
+                            </p>
+                        </div>
+                        <button onclick="openStudyModal('Português', 'Exercícios práticos de leitura de contratos, cartas e avisos de trabalho. Foco na escrita clara e confiante.')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
+                            Acessar Fichas
+                        </button>
+                    </div>
+
+                    <!-- Módulo 2: Matemática -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center text-2xl font-bold mb-4">
+                                <i class="fa-solid fa-calculator"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Matemática do Dia a Dia</h3>
+                            <p class="text-slate-600 text-sm mb-4">
+                                Contas de supermercado, cálculo de troco, orçamento doméstico, juros simples, porcentagem e medidas para obras ou cozinha.
+                            </p>
+                        </div>
+                        <button onclick="openStudyModal('Matemática', 'Atividades práticas de orçamento, cálculo de troco e porcentagem no comércio local.')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
+                            Acessar Fichas
+                        </button>
+                    </div>
+
+                    <!-- Módulo 3: Ciências & Saúde -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-amber-100 text-amber-800 rounded-xl flex items-center justify-center text-2xl font-bold mb-4">
+                                <i class="fa-solid fa-heart-pulse"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Ciências da Natureza & Saúde</h3>
+                            <p class="text-slate-600 text-sm mb-4">
+                                Cuidados com a saúde, alimentação saudável, postura no trabalho, prevenção de doenças e meio ambiente urbano.
+                            </p>
+                        </div>
+                        <button onclick="openStudyModal('Ciências & Saúde', 'Guias práticos de higiene postural no trabalho, alimentação e prevenção de saúde comunitária.')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
+                            Acessar Fichas
+                        </button>
+                    </div>
+
+                    <!-- Módulo 4: Ciências Humanas -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-purple-100 text-purple-700 rounded-xl flex items-center justify-center text-2xl font-bold mb-4">
+                                <i class="fa-solid fa-people-group"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Ciências Humanas & Cidadania</h3>
+                            <p class="text-slate-600 text-sm mb-4">
+                                Direitos trabalhistas, história do Brasil, geografia comunitária, constituição e cidadania ativa no bairro.
+                            </p>
+                        </div>
+                        <button onclick="openStudyModal('Ciências Humanas', 'Resumos simples sobre Direitos do Trabalhador, Carteira de Trabalho e deveres cidadãos.')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
+                            Acessar Fichas
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DE RECURSOS E QUIZ INTERATIVO DA AULA -->
+        <section id="recursos" class="py-16 bg-slate-100 border-t border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="grid lg:grid-cols-12 gap-10">
+
+                    <!-- COLUNA ESQUERDA: FICHAS DE ESTUDO RÁPIDAS -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <div>
+                            <span class="text-brand-600 font-bold text-sm uppercase tracking-wide">Material de Apoio</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+                                Fichas Práticas de Estudo
+                            </h2>
+                            <p class="text-slate-600 text-sm mt-2">
+                                Baixe ou visualize resumos ilustrados prontos para impressão ou leitura no celular.
+                            </p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-file-lines text-red-500 text-2xl"></i>
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-sm">Guia de Leitura de Contrato de Trabalho</h3>
+                                        <span class="text-xs text-slate-500">PDF • Língua Portuguesa</span>
+                                    </div>
+                                </div>
+                                <button onclick="simulateDownload('Guia de Contrato de Trabalho')" class="text-brand-600 hover:text-brand-800 p-2 rounded-lg hover:bg-brand-50" title="Baixar Material">
+                                    <i class="fa-solid fa-download text-lg"></i>
+                                </button>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-file-lines text-emerald-500 text-2xl"></i>
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-sm">Tabela Prática de Cálculo de Troco</h3>
+                                        <span class="text-xs text-slate-500">PDF • Matemática</span>
+                                    </div>
+                                </div>
+                                <button onclick="simulateDownload('Tabela de Troco')" class="text-brand-600 hover:text-brand-800 p-2 rounded-lg hover:bg-brand-50" title="Baixar Material">
+                                    <i class="fa-solid fa-download text-lg"></i>
+                                </button>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-file-lines text-purple-500 text-2xl"></i>
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-sm">Resumo dos Direitos do Trabalhador</h3>
+                                        <span class="text-xs text-slate-500">PDF • Cidadania</span>
+                                    </div>
+                                </div>
+                                <button onclick="simulateDownload('Direitos do Trabalhador')" class="text-brand-600 hover:text-brand-800 p-2 rounded-lg hover:bg-brand-50" title="Baixar Material">
+                                    <i class="fa-solid fa-download text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA DIREITA: QUIZ RÁPIDO DO DIA -->
+                    <div class="lg:col-span-7">
+                        <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-md">
+                            <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+                                <div>
+                                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase">Interativo</span>
+                                    <h3 class="text-xl font-bold text-slate-900 mt-1">Desafio Prático do Dia</h3>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-slate-500 block">Pontuação</span>
+                                    <span id="quiz-score" class="font-extrabold text-brand-600 text-lg">0 / 2</span>
+                                </div>
+                            </div>
+
+                            <!-- Área de Conteúdo do Quiz -->
+                            <div id="quiz-container">
+                                <!-- Pergunta 1 -->
+                                <div id="question-1" class="space-y-4">
+                                    <p class="font-semibold text-slate-800 text-base sm:text-lg">
+                                        1. João comprou R$ 14,50 em pães no mercado e pagou com uma nota de R$ 20,00. Quanto ele deve receber de troco?
+                                    </p>
+                                    <div class="space-y-2">
+                                        <button onclick="checkAnswer(1, false, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 transition flex items-center justify-between">
+                                            <span>a) R$ 4,50</span>
+                                            <i class="fa-regular fa-circle text-slate-400"></i>
+                                        </button>
+                                        <button onclick="checkAnswer(1, true, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 transition flex items-center justify-between">
+                                            <span>b) R$ 5,50</span>
+                                            <i class="fa-regular fa-circle text-slate-400"></i>
+                                        </button>
+                                        <button onclick="checkAnswer(1, false, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 transition flex items-center justify-between">
+                                            <span>c) R$ 6,50</span>
+                                            <i class="fa-regular fa-circle text-slate-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Pergunta 2 (Oculta Inicialmente) -->
+                                <div id="question-2" class="space-y-4 hidden">
+                                    <p class="font-semibold text-slate-800 text-base sm:text-lg">
+                                        2. Em um aviso na empresa está escrito: <em class="bg-amber-50 px-1 font-normal">"É obrigatório o uso do capacete de segurança neste local."</em> O que isso significa?
+                                    </p>
+                                    <div class="space-y-2">
+                                        <button onclick="checkAnswer(2, false, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 transition flex items-center justify-between">
+                                            <span>a) O capacete é opcional para visitantes.</span>
+                                            <i class="fa-regular fa-circle text-slate-400"></i>
+                                        </button>
+                                        <button onclick="checkAnswer(2, true, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 transition flex items-center justify-between">
+                                            <span>b) Todas as pessoas devem usar o capacete obrigatoriamente.</span>
+                                            <i class="fa-regular fa-circle text-slate-400"></i>
+                                        </button>
+                                        <button onclick="checkAnswer(2, false, this)" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 transition flex items-center justify-between">
+                                            <span>c) O capacete só deve ser usado se chover.</span>
+                                            <i class="fa-regular fa-circle text-slate-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Feedback do Quiz -->
+                                <div id="quiz-feedback" class="mt-4 p-4 rounded-xl hidden text-sm font-semibold"></div>
+
+                                <!-- Botão Próximo -->
+                                <div class="mt-6 flex justify-end">
+                                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-brand-600 hover:bg-brand-700 text-white font-bold px-5 py-2.5 rounded-lg text-sm transition">
+                                        Próxima Pergunta <i class="fa-solid fa-arrow-right ml-1"></i>
+                                    </button>
+                                    <button id="restart-btn" onclick="restartQuiz()" class="hidden bg-slate-700 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-lg text-sm transition">
+                                        Refazer Desafio <i class="fa-solid fa-rotate-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ESPAÇO DO TRABALHADOR / DICAS DE ORGANIZAÇÃO DE TEMPO -->
+        <section id="trabalhador" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <span class="bg-brand-100 text-brand-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Conciliando Rotinas</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
+                        Espaço do Estudante Trabalhador
+                    </h2>
+                    <p class="text-slate-600 text-base mt-2">
+                        Sabemos que organizar o trabalho, a família e os estudos é um grande desafio. Confira dicas simples para o seu dia a dia.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-10 h-10 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center font-bold text-lg mb-4">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">Estudo em Pequenos Blocos</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Aproveite 15 a 20 minutos no transporte ou na pausa do almoço para ler uma ficha de resumo ou rever anotações.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center font-bold text-lg mb-4">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">Converse com sua Família</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Compartilhe seu horário de estudos com seus familiares para ter um momento mais tranquilo e focado em casa.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-lg mb-4">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">Valorize Seu Progresso</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Cada aula concluída é uma conquista importante. Não se compare com os outros; celebre a sua própria caminhada!
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- RODAPÉ (FOOTER) -->
+    <footer class="bg-slate-900 text-slate-300 py-10 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fa-solid fa-book-open-reader text-brand-500 text-2xl"></i>
+                        <span class="text-xl font-bold text-white">Portal EJA</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Iniciativa dedicada a apoiar jovens e adultos na conclusão de seus estudos com dignidade, acolhimento e qualidade.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-3">Navegação Rápida</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#inicio" class="hover:text-brand-400 transition">Início</a></li>
+                        <li><a href="#materias" class="hover:text-brand-400 transition">Módulos de Ensino</a></li>
+                        <li><a href="#recursos" class="hover:text-brand-400 transition">Exercícios & Quiz</a></li>
+                        <li><a href="#trabalhador" class="hover:text-brand-400 transition">Dicas para Estudantes</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-3">Dúvidas ou Sugestões?</h4>
+                    <p class="text-sm text-slate-400 mb-3">
+                        Fale com a equipe pedagógica ou tire suas dúvidas com seu professor responsável na escola.
+                    </p>
+                    <div class="inline-flex items-center space-x-2 text-xs bg-slate-800 px-3 py-2 rounded-lg text-amber-400 border border-slate-700">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Ambiente de Aprendizagem Aberto</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
+                <p>&copy; Portal de Recursos de Aula EJA Brasil. Desenvolvido para Acessibilidade e Inclusão Social.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL DE VISUALIZAÇÃO DE CONTEÚDO DA MATÉRIA -->
+    <div id="study-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-slate-200">
+            <button onclick="closeStudyModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2" aria-label="Fechar Modal">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-brand-100 text-brand-600 p-3 rounded-xl">
+                    <i class="fa-solid fa-book-bookmark text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-500 uppercase font-bold">Resumo do Módulo</span>
+                    <h3 id="modal-title" class="text-xl font-bold text-slate-900"></h3>
+                </div>
+            </div>
+            <p id="modal-description" class="text-slate-600 text-base leading-relaxed mb-6"></p>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+                <h4 class="font-bold text-sm text-slate-800 mb-1"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Dica de Aprendizado:</h4>
+                <p class="text-xs text-slate-600">Leia o conteúdo com atenção e tente relacionar com situações reais do seu trabalho ou da sua rotina familiar.</p>
+            </div>
+            <div class="flex justify-end">
+                <button onclick="closeStudyModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-5 py-2.5 rounded-lg text-sm transition">
+                    Entendi, fechar janela
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENSAGEM FLUTUANTE DE NOTIFICAÇÃO (TOAST) -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl z-50 hidden flex items-center space-x-3 border border-slate-700">
+        <i id="toast-icon" class="fa-solid fa-circle-info text-amber-400"></i>
+        <span id="toast-msg" class="text-sm font-medium"></span>
+    </div>
+
+    <!-- JAVASCRIPT DE INTERATIVIDADE E ACESSIBILIDADE -->
+    <script>
+        /* ==========================================
+           CONTROLE DE ACESSIBILIDADE (FONTE E ALTO CONTRASTE)
+        ========================================== */
+        let currentFontScale = 100; // Porcentagem padrão do tamanho de fonte
+
+        function changeFontSize(delta) {
+            currentFontScale += delta * 10;
+            if (currentFontScale < 80) currentFontScale = 80;
+            if (currentFontScale > 140) currentFontScale = 140;
+            document.documentElement.style.fontSize = currentFontScale + '%';
+            showToast(`Tamanho da fonte ajustado para ${currentFontScale}%`);
+        }
+
+        function resetFontSize() {
+            currentFontScale = 100;
+            document.documentElement.style.fontSize = '100%';
+            showToast("Tamanho da fonte restaurado ao padrão.");
+        }
+
+        function toggleHighContrast() {
+            const body = document.getElementById('app-body');
+            body.classList.toggle('high-contrast');
+            
+            if (body.classList.contains('high-contrast')) {
+                showToast("Modo de Alto Contraste Ativado.");
+            } else {
+                showToast("Modo Normal Ativado.");
+            }
+        }
+
+        /* ==========================================
+           MENU MOBILE
+        ========================================== */
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            menu.classList.toggle('hidden');
+            
+            if (menu.classList.contains('hidden')) {
+                icon.className = 'fa-solid fa-bars text-2xl';
+            } else {
+                icon.className = 'fa-solid fa-xmark text-2xl';
+            }
+        }
+
+        /* ==========================================
+           LÓGICA DO QUIZ INTERATIVO DA AULA
+        ========================================== */
+        let currentQuestion = 1;
+        let score = 0;
+        let answeredQuestions = { 1: false, 2: false };
+
+        function checkAnswer(questionNum, isCorrect, btnElement) {
+            if (answeredQuestions[questionNum]) return; // Impede alterar resposta
+            
+            answeredQuestions[questionNum] = true;
+            const parent = btnElement.parentElement;
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const nextBtn = document.getElementById('next-btn');
+            const restartBtn = document.getElementById('restart-btn');
+
+            // Desabilita outros botões da mesma pergunta
+            const buttons = parent.querySelectorAll('button');
+            buttons.forEach(btn => btn.classList.add('opacity-60', 'cursor-not-allowed'));
+
+            if (isCorrect) {
+                score++;
+                btnElement.classList.remove('opacity-60', 'border-slate-200');
+                btnElement.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-800', 'font-bold');
+                feedbackEl.className = 'mt-4 p-4 rounded-xl text-sm font-semibold bg-emerald-100 text-emerald-900 border border-emerald-300';
+                feedbackEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Resposta Correta! Muito bem!';
+            } else {
+                btnElement.classList.remove('opacity-60', 'border-slate-200');
+                btnElement.classList.add('bg-red-50', 'border-red-500', 'text-red-800', 'font-bold');
+                feedbackEl.className = 'mt-4 p-4 rounded-xl text-sm font-semibold bg-red-100 text-red-900 border border-red-300';
+                feedbackEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Resposta Incorreta. Revise o material com atenção!';
+            }
+
+            feedbackEl.classList.remove('hidden');
+            document.getElementById('quiz-score').innerText = `${score} / 2`;
+
+            if (questionNum === 1) {
+                nextBtn.classList.remove('hidden');
+            } else {
+                restartBtn.classList.remove('hidden');
+            }
+        }
+
+        function nextQuestion() {
+            document.getElementById('question-1').classList.add('hidden');
+            document.getElementById('question-2').classList.remove('hidden');
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            currentQuestion = 2;
+        }
+
+        function restartQuiz() {
+            score = 0;
+            currentQuestion = 1;
+            answeredQuestions = { 1: false, 2: false };
+
+            document.getElementById('quiz-score').innerText = '0 / 2';
+            document.getElementById('question-2').classList.add('hidden');
+            document.getElementById('question-1').classList.remove('hidden');
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('restart-btn').classList.add('hidden');
+
+            // Resetar estilos dos botões
+            const buttons = document.querySelectorAll('#quiz-container button');
+            buttons.forEach(btn => {
+                btn.className = 'w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 transition flex items-center justify-between';
+            });
+        }
+
+        /* ==========================================
+           MODAL E NOTIFICAÇÕES (TOAST)
+        ========================================== */
+        function openStudyModal(title, description) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-description').innerText = description;
+            document.getElementById('study-modal').classList.remove('hidden');
+        }
+
+        function closeStudyModal() {
+            document.getElementById('study-modal').classList.add('hidden');
+        }
+
+        function simulateDownload(resourceName) {
+            showToast(`Simulando download de: "${resourceName}"`);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = message;
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
